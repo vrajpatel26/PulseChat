@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs"
 export const signup = async (req, res) => {
 
     try {
-        const { userName , email, password } = req.body;
+        const { userName, email, password } = req.body;
 
         const checkUserByUserName = await User.findOne({ userName })
 
@@ -36,7 +36,7 @@ export const signup = async (req, res) => {
         res.cookie("token", token, ({
             httpOnly: true,
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            sameSite: "None",
+            sameSite: "Strict",
             secure: false
         }))
 
@@ -70,7 +70,7 @@ export const login = async (req, res) => {
         res.cookie("token", token, ({
             httpOnly: true,
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            sameSite: "None",
+            sameSite: "Strict",
             secure: false
         }))
 
@@ -80,7 +80,7 @@ export const login = async (req, res) => {
         return res.status(500).json({ message: `login error ${error}` })
     }
 }
-    
+
 
 export const logout = async (req, res) => {
     try {
