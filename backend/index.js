@@ -1,9 +1,13 @@
-import express from "express"
+//used for dns issue for connect db
+import dns from "dns"
+dns.setServers(['1.1.1.1', '8.8.8.8']);
+
 import dotenv from "dotenv"
+dotenv.config()
+import express from "express"
 import connectDB from "./config/db.js";
 import authRouter from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser"
-dotenv.config()
 import cors from "cors"
 import userRouter from "./routes/user.routes.js";
 

@@ -16,7 +16,7 @@ const Profile = () => {
     const [name, setName] = useState(userData.name || "")
     const [frontendImage, setFrontendImage] = useState(userData.image || dp)
     const [backendImage, setBackendImage] = useState(null)
-    const [saving,setSaving] = useState(false)
+    const [saving, setSaving] = useState(false)
 
     let image = useRef()
 
@@ -26,21 +26,21 @@ const Profile = () => {
         setFrontendImage(URL.createObjectURL(file))
     }
 
-    const handleProfile = async(e) =>{
+    const handleProfile = async (e) => {
 
         e.preventDefault()
-            setSaving(true)
+        setSaving(true)
 
 
         try {
             let formData = new FormData();
-            formData.append("name",name);
+            formData.append("name", name);
 
-            if(backendImage){
-                formData.append("image",backendImage)
+            if (backendImage) {
+                formData.append("image", backendImage)
             }
 
-            let result = await axios.put(`${serverUrl}/api/user/profile`,formData,{withCredentials:true})
+            let result = await axios.put(`${serverUrl}/api/user/profile`, formData, { withCredentials: true })
 
             setSaving(false)
 
@@ -52,7 +52,7 @@ const Profile = () => {
 
             setSaving(false)
 
-            
+
         }
     }
 
@@ -64,13 +64,20 @@ const Profile = () => {
 
             </div>
 
-            <div className=' bg-white rounded-full border-2 border-[#20c7ff]  relative ' onClick={() => image.current.click()}>
+            <div
+                className='relative w-[200px] h-[200px]'
+                onClick={() => image.current.click()}
+            >
 
-                <div className='w-[200px] h-[200px] overflow-hidden rounded-full flex justify-center items-center '>
-                    <img src={frontendImage} alt="dp" className='h-[100%] ' />
+                <div className='bg-white rounded-full border-2 border-[#20c7ff] w-full h-full overflow-hidden cursor-pointer'>
+                    <img
+                        src={frontendImage}
+                        alt="dp"
+                        className='w-full h-full object-cover'
+                    />
                 </div>
 
-                <IoCameraOutline className='absolute bottom-7 right-1 text-gray-700 w-[30px] h-[30px]' />
+                <IoCameraOutline className='absolute bottom-4 right-2 text-gray-700 w-[30px] h-[30px] bg-white border-2 border-[#20c7ff] rounded-full p-1 cursor-pointer' />
 
             </div>
 
@@ -85,7 +92,7 @@ const Profile = () => {
 
                     <input type="email" readOnly className='w-[140%] h-[50px] outline-none border-2 border-[#20c7ff] px-[20px] py-[10px] bg-white rounded-lg shadow-gray-200 shadow-lg  text-gray-400 text-[19px] ' value={userData?.email} />
 
-                    <button className='w-[130px] border-2 border-none px-[20px] py-[10px] bg-[#20c7ff] rounded-lg  shadow-gray-200 shadow-lg  mt-[10px] hover:bg-[#04ace4] font-medium' disabled={saving} >{saving ? "saving...":"Save profile"}</button>
+                    <button className='w-[130px] border-2 border-none px-[20px] py-[10px] bg-[#20c7ff] rounded-lg  shadow-gray-200 shadow-lg  mt-[10px] hover:bg-[#04ace4] font-medium' disabled={saving} >{saving ? "saving..." : "Save profile"}</button>
 
                 </form>
 
