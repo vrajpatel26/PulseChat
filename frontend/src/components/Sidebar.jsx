@@ -1,10 +1,33 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import dp from "../assets/dp.png"
 import { IoIosSearch } from "react-icons/io";
+import { RxCross2 } from "react-icons/rx";
+import { TbLogout2 } from "react-icons/tb";
+import axios from 'axios';
+import { serverUrl } from '../main';
+import { useNavigate } from 'react-router-dom';
+import { setOtherUsers, setUserData } from '../redux/userSlice';
+
 
 const Sidebar = () => {
-    let { userData } = useSelector(state => state.user)
+    let { userData, otherUsers } = useSelector(state => state.user)
+    let [search, setSearch] = useState(false)
+    let dispatch = useDispatch()
+    let navigate = useNavigate()
+    let handleLogOut = async () => {
+        try {
+            let result = await axios.get(`${serverUrl}/api/auth/logout`, { withCredentials: true })
+
+            dispatch(setUserData(null))
+            dispatch(setOtherUsers(null))
+            navigate("/login")
+
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
     return (
         <div className='lg:w-[30%] w-full h-full bg-slate-200'>
 
@@ -13,9 +36,9 @@ const Sidebar = () => {
                 <h1 className='text-white text-[27px] font-bold  px-[30px]'>PulseChat</h1>
 
                 <div className='flex justify-between items-center'>
-                    <h1 className='text-gray-600 text-xl font-bold  px-[30px]'>Hii , {userData.name}</h1>
+                    <h1 className='text-gray-600 text-xl font-bold  px-[30px]'>Hii , {userData.name || "User"}</h1>
 
-                    <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[60px] w-[60px] mr-3 '>
+                    <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[60px] w-[60px] mr-3 cursor-pointer ' onClick={() => navigate("/profile")}>
                         <img
                             src={userData.image || dp}
                             alt="dp"
@@ -23,12 +46,39 @@ const Sidebar = () => {
                         />
                     </div>
 
-                </div>
 
-                <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] flex items-center justify-center  '>
-                    <IoIosSearch className='h-[30px] w-[30px]' />
                 </div>
+                <div className='flex items-center gap-[20px]'>
 
+                    {!search &&
+                        <div className='bg-white rounded-full mt-[10px] border-2 border-[#20c7ff] h-[50px] w-[50px] flex items-center justify-center ml-[25px] ' onClick={() => setSearch(true)}>
+                            <IoIosSearch className='h-[25px] w-[25px]' />
+                        </div>}
+
+                    {search &&
+                        <form className='w-[90%] h-[50px] ml-[30px] mt-[10px] bg-white flex items-center gap-[10px] rounded-full overflow-hidden px-[20px]'>
+                            <IoIosSearch className='h-[25px] w-[25px] cursor-pointer' />
+                            <input type="text" placeholder='search users...' className='h-full w-full p-[10px] outline-0 border-0 ' />
+                            <RxCross2 className='h-[25px] w-[25px] cursor-pointer' onClick={() => setSearch(false)} />
+
+                        </form>
+                    }
+
+                    {otherUsers?.map((user) => (
+                        <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] mr-3 mt-[10px]'>
+                            <img
+                                src={user.image || dp}
+                                alt="dp"
+                                className='w-full h-full object-cover rounded-full'
+                            />
+                        </div>
+                    ))}
+
+                </div>
+            </div>
+
+            <div className='bg-white text-gray-600 rounded-full mt-[10px] border-2 border-[#20c7ff] h-[50px] w-[50px] flex items-center justify-center ml-[25px] fixed bottom-[25px]  cursor-pointer' onClick={handleLogOut}>
+                <TbLogout2 className='h-[25px] w-[25px]' />
             </div>
 
         </div>

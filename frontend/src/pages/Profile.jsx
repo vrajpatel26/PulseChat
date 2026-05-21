@@ -43,10 +43,8 @@ const Profile = () => {
             let result = await axios.put(`${serverUrl}/api/user/profile`, formData, { withCredentials: true })
 
             setSaving(false)
-
-
             dispatch(setUserData(result.data))
-
+            navigate("/")
         } catch (error) {
             console.log(error);
 

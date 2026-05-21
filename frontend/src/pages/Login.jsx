@@ -29,7 +29,7 @@ const Login = () => {
 
             // console.log(result);
             dispatch(setUserData(result.data))
-
+            navigate("/")
             setEmail("");
             setPassword("")
 

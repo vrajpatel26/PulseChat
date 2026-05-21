@@ -6,9 +6,11 @@ import getCurrentUser from './customHook/getCurrentUser'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
 import { useSelector } from 'react-redux'
+import getOtherUsers from './customHook/getOtherUsers'
 
 const App = () => {
   getCurrentUser()
+  getOtherUsers()
   let { userData } = useSelector(state => state.user)
   return (
     <Routes>

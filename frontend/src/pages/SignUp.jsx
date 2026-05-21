@@ -32,7 +32,7 @@ const SignUp = () => {
 
             // console.log(result);
             dispatch(setUserData(result.data))
-
+            navigate("/profile")
             setUserName("");
             setEmail("");
             setPassword("");
