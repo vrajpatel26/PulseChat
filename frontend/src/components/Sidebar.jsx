@@ -7,11 +7,11 @@ import { TbLogout2 } from "react-icons/tb";
 import axios from 'axios';
 import { serverUrl } from '../main';
 import { useNavigate } from 'react-router-dom';
-import { setOtherUsers, setUserData } from '../redux/userSlice';
+import { setOtherUsers, setSelectedUser, setUserData } from '../redux/userSlice';
 
 
 const Sidebar = () => {
-    let { userData, otherUsers } = useSelector(state => state.user)
+    let { userData, otherUsers , selectedUser } = useSelector(state => state.user)
     let [search, setSearch] = useState(false)
     let dispatch = useDispatch()
     let navigate = useNavigate()
@@ -29,7 +29,7 @@ const Sidebar = () => {
         }
     }
     return (
-        <div className='lg:w-[30%] w-full h-full bg-slate-200'>
+        <div className={`lg:w-[30%] lg:block ${!selectedUser ? "block" : "hidden "}w-full h-full bg-slate-200`}>
 
             <div className='w-full h-[300px] bg-[#20c7ff] rounded-b-[30%] shadow-gray-200 shadow-lg flex justify-center flex-col '>
 
@@ -52,7 +52,7 @@ const Sidebar = () => {
 
                     {!search &&
                         <div className='bg-white rounded-full mt-[10px] border-2 border-[#20c7ff] h-[50px] w-[50px] flex items-center justify-center ml-[25px] ' onClick={() => setSearch(true)}>
-                            <IoIosSearch className='h-[25px] w-[25px]' />
+                            <IoIosSearch className='h-[25px] w-[25px] cursor-pointer' />
                         </div>}
 
                     {search &&
@@ -63,8 +63,7 @@ const Sidebar = () => {
 
                         </form>
                     }
-
-                    {otherUsers?.map((user) => (
+                    {!search && otherUsers?.map((user) => (
                         <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] mr-3 mt-[10px]'>
                             <img
                                 src={user.image || dp}
@@ -74,7 +73,24 @@ const Sidebar = () => {
                         </div>
                     ))}
 
+
                 </div>
+            </div>
+
+            <div className='w-full flex flex-col items-center gap-[20px] overflow-auto mt-[15px]'>
+                {otherUsers?.map((user) => (
+                    <div className='w-[90%] h-[60px] rounded-full flex justify-start items-center bg-white gap-[20px] hover:bg-gray-300 cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
+                        <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[40px] w-[40px] ml-[10px] '>
+                            <img
+                                src={user.image || dp}
+                                alt="dp"
+                                className='w-full h-full object-cover rounded-full'
+                            />
+                        </div>
+                            <h1 className='text-gray-600 text-[15px] font-semibold'>{user.name || user.userName}</h1>
+                    </div>
+
+                ))}
             </div>
 
             <div className='bg-white text-gray-600 rounded-full mt-[10px] border-2 border-[#20c7ff] h-[50px] w-[50px] flex items-center justify-center ml-[25px] fixed bottom-[25px]  cursor-pointer' onClick={handleLogOut}>
