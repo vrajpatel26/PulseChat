@@ -29,7 +29,7 @@ const Sidebar = () => {
         }
     }
     return (
-        <div className={`lg:w-[30%] lg:block ${!selectedUser ? "block" : "hidden "}w-full h-full bg-slate-200`}>
+        <div className={`lg:w-[30%] lg:block ${!selectedUser ? "block" : "hidden "} w-full h-full bg-slate-200`}>
 
             <div className='w-full h-[300px] bg-[#20c7ff] rounded-b-[30%] shadow-gray-200 shadow-lg flex justify-center flex-col '>
 
