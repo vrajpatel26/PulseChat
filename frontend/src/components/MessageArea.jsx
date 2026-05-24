@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { IoArrowBack } from "react-icons/io5";
 import { GrEmoji } from "react-icons/gr";
 import { IoImages } from "react-icons/io5";
@@ -7,18 +7,60 @@ import EmojiPicker from 'emoji-picker-react';
 import dp from "../assets/dp.png"
 import { useDispatch, useSelector } from 'react-redux';
 import { setSelectedUser } from '../redux/userSlice';
+import SenderMessage from './SenderMessage';
+import ReceiverMessage from './ReceiverMessage';
+import { serverUrl } from '../main';
+import axios from 'axios';
 
 const MessageArea = () => {
     let { selectedUser } = useSelector(state => state.user)
     let dispatch = useDispatch()
     let [showPicker, setShowPicker] = useState(false)
-    let [input , setInput] = useState("")
+    let [input, setInput] = useState("")
+    let [frontendImage, setFrontendImage] = useState(null)
+    let [backendImage, setBackendImage] = useState(null)
 
-    const onEmojiClick = (emojiData) =>{
-        setInput(prevInput=>prevInput + emojiData.emoji)
+    let image = useRef()
+
+    const onEmojiClick = (emojiData) => {
+        setInput(prevInput => prevInput + emojiData.emoji)
 
         setShowPicker(false)
     }
+
+
+    const handleImage = (e) => {
+        let file = e.target.files[0];
+
+        setBackendImage(file)
+        setFrontendImage(URL.createObjectURL(file))
+    }
+
+    const handleSendMessage = async (e) => {
+        e.preventDefault()
+        try {
+            let formData = new FormData()
+            formData.append("message", input)
+
+            if (backendImage) {
+                formData.append("image", backendImage)
+            }
+
+            let result = await axios.post(`${serverUrl}/api/message/send/${selectedUser._id}`, formData, { withCredentials: true })
+
+            console.log(result.data);
+
+            setInput("")    
+            setFrontendImage(null)
+            setBackendImage(null)
+            
+
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
 
     return (
         <div className={`lg:w-[70%] ${selectedUser ? "flex" : "hidden"} lg:block w-full h-full bg-slate-200 border-l-2 border-gray-300 relative `}>
@@ -40,12 +82,13 @@ const MessageArea = () => {
 
                     </div>
 
-                    <div className='bg-gray-400 w-full h-[535px]'>
+                    <div className=' w-full h-[535px] flex flex-col py-[15px] px-[20px] overflow-auto gap-[20px]'>
                         {showPicker &&
                             <div className='absolute bottom-[100px] left-[20px]'>
-                                <EmojiPicker width={260} height={350} onEmojiClick={onEmojiClick}/>
+                                <EmojiPicker width={260} height={350} onEmojiClick={onEmojiClick} />
                             </div>
                         }
+
                     </div>
                 </div>
             }
@@ -58,27 +101,33 @@ const MessageArea = () => {
             {selectedUser &&
                 <div className='absolute bottom-[20px] left-0 w-full flex justify-center items-center px-[10px]'>
 
-                    <form className='w-full max-w-[900px] h-[60px] bg-slate-300 rounded-full flex items-center gap-[20px] px-[20px]' onSubmit={(e) => e.preventDefault()}>
+                    <div>
+                        <img src={frontendImage} alt="" className='w-[100px] absolute bottom-[100px] right-[100px] rounded-lg' />
+                    </div>
+
+                    <form className='w-full max-w-[900px] h-[60px] bg-slate-300 rounded-full flex items-center gap-[20px] px-[20px]' onSubmit={handleSendMessage}>
 
                         <div onClick={() => setShowPicker(prev => !prev)}>
                             <GrEmoji className='text-[30px] text-gray-700 cursor-pointer' />
                         </div>
 
+                        <input type="file" accept='image/*' ref={image} hidden onChange={handleImage} />
+
                         <input
                             type="text"
                             className='h-full w-full border-0 outline-none text-[20px] bg-transparent'
                             placeholder='Message'
-                            onChange={(e)=>setInput(e.target.value)}
+                            onChange={(e) => setInput(e.target.value)}
                             value={input}
                         />
 
-                        <div>
+                        <div onClick={() => image.current.click()}>
                             <IoImages className='text-[30px] cursor-pointer' />
                         </div>
 
-                        <div>
+                        <button>
                             <IoSendSharp className='text-[30px] cursor-pointer' />
-                        </div>
+                        </button>
 
                     </form>
 
