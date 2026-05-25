@@ -11,9 +11,11 @@ import SenderMessage from './SenderMessage';
 import ReceiverMessage from './ReceiverMessage';
 import { serverUrl } from '../main';
 import axios from 'axios';
+import { setMessages } from '../redux/messageSlice';
 
 const MessageArea = () => {
-    let { selectedUser } = useSelector(state => state.user)
+    let { selectedUser, userData } = useSelector(state => state.user)
+    let { messages } = useSelector(state => state.message)
     let dispatch = useDispatch()
     let [showPicker, setShowPicker] = useState(false)
     let [input, setInput] = useState("")
@@ -48,12 +50,13 @@ const MessageArea = () => {
 
             let result = await axios.post(`${serverUrl}/api/message/send/${selectedUser._id}`, formData, { withCredentials: true })
 
-            console.log(result.data);
+            // console.log(result.data);
+            dispatch(setMessages([...messages, result.data]))
 
-            setInput("")    
+            setInput("")
             setFrontendImage(null)
             setBackendImage(null)
-            
+
 
         } catch (error) {
             console.log(error);
@@ -88,7 +91,15 @@ const MessageArea = () => {
                                 <EmojiPicker width={260} height={350} onEmojiClick={onEmojiClick} />
                             </div>
                         }
-
+                        {messages?.map((mess) => (
+                            <div key={mess._id}>
+                                {
+                                    mess.sender?.toString() === userData?._id?.toString()
+                                        ? <SenderMessage image={mess.image} message={mess.message} />
+                                        : <ReceiverMessage image={mess.image} message={mess.message} />
+                                }
+                            </div>
+                        ))}
                     </div>
                 </div>
             }
