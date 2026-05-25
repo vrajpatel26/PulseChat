@@ -91,7 +91,7 @@ const MessageArea = () => {
                                 <EmojiPicker width={260} height={350} onEmojiClick={onEmojiClick} />
                             </div>
                         }
-                        {messages?.map((mess) => (
+                        {messages && messages?.map((mess) => (
                             <div key={mess._id}>
                                 {
                                     mess.sender?.toString() === userData?._id?.toString()
