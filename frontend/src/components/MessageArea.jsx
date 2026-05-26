@@ -85,7 +85,7 @@ const MessageArea = () => {
 
                     </div>
 
-                    <div className=' w-full h-[535px] flex flex-col py-[15px] px-[20px] overflow-auto gap-[20px]'>
+                    <div className=' w-full lg:h-[535px] h-[700px]   flex flex-col py-[25px] px-[20px] overflow-auto gap-[20px]'>
                         {showPicker &&
                             <div className='absolute bottom-[100px] left-[20px]'>
                                 <EmojiPicker width={260} height={350} onEmojiClick={onEmojiClick} />

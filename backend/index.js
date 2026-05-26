@@ -11,10 +11,10 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import userRouter from "./routes/user.routes.js";
 import messageRouter from "./routes/message.route.js";
+import { app, server} from "./socket/socket.js";
 
 const PORT = process.env.PORT ||5000;
 
-const app = express();
 
 app.use(cors({
     origin:"http://localhost:5173",
@@ -32,7 +32,7 @@ app.use("/api/message",messageRouter)
 
 
 
-app.listen(PORT,()=>{
+server.listen(PORT,()=>{
     connectDB()
     console.log("server is started ");
     
