@@ -5,13 +5,44 @@ import SignUp from './pages/SignUp'
 import getCurrentUser from './customHook/getCurrentUser'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import getOtherUsers from './customHook/getOtherUsers'
+import { useEffect } from 'react'
+import { io } from "socket.io-client"
+import { serverUrl } from './main'
+import { setOnlineUsers, setSocket } from './redux/userSlice'
 
 const App = () => {
   getCurrentUser()
   getOtherUsers()
-  let { userData } = useSelector(state => state.user)
+  let { userData, socket, onlineUsers } = useSelector(state => state.user)
+  let dispatch = useDispatch()
+
+  useEffect(() => {
+    if (userData) {
+      const socketio = io(`${serverUrl}`, {
+        query: {
+          userId: userData?._id
+        }
+      })
+
+      dispatch(setSocket(socketio))
+
+      socketio.on("getOnlineUsers", (users) => {
+        dispatch(setOnlineUsers(users))
+      })
+
+      return () => socketio.close()
+    }
+    else {
+      if (socket) {
+        socket.close()
+        dispatch(setSocket(null))
+      }
+    }
+
+  }, [userData?._id])
+
   return (
     <Routes>
       <Route path='/login' element={!userData ? <Login /> : <Navigate to="/" />} />

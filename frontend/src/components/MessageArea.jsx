@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { IoArrowBack } from "react-icons/io5";
 import { GrEmoji } from "react-icons/gr";
 import { IoImages } from "react-icons/io5";
@@ -14,7 +14,7 @@ import axios from 'axios';
 import { setMessages } from '../redux/messageSlice';
 
 const MessageArea = () => {
-    let { selectedUser, userData } = useSelector(state => state.user)
+    let { selectedUser, userData, socket } = useSelector(state => state.user)
     let { messages } = useSelector(state => state.message)
     let dispatch = useDispatch()
     let [showPicker, setShowPicker] = useState(false)
@@ -64,6 +64,13 @@ const MessageArea = () => {
         }
     }
 
+    useEffect(() => {
+        socket.on("newMessage", (msg) => {
+            dispatch(setMessages([...messages, msg]))
+        })
+        return () => socket.off("newMessage")
+    }, [messages, setMessages])
+
 
     return (
         <div className={`lg:w-[70%] ${selectedUser ? "flex" : "hidden"} lg:block w-full h-full bg-slate-200 border-l-2 border-gray-300 relative `}>
@@ -85,7 +92,7 @@ const MessageArea = () => {
 
                     </div>
 
-                    <div className=' w-full lg:h-[535px] h-[700px]   flex flex-col py-[25px] px-[20px] overflow-auto gap-[20px]'>
+                    <div className=' w-full lg:h-[535px] h-[520px] sm:h-[750px]   flex flex-col py-[25px] px-[20px] overflow-auto gap-[20px] bg-emerald-600'>
                         {showPicker &&
                             <div className='absolute bottom-[100px] left-[20px]'>
                                 <EmojiPicker width={260} height={350} onEmojiClick={onEmojiClick} />
