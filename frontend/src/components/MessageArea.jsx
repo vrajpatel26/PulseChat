@@ -40,6 +40,11 @@ const MessageArea = () => {
 
     const handleSendMessage = async (e) => {
         e.preventDefault()
+
+        if (input == 0 && backendImage == null) {
+            return
+        }
+
         try {
             let formData = new FormData()
             formData.append("message", input)
@@ -76,7 +81,7 @@ const MessageArea = () => {
         <div className={`lg:w-[70%] ${selectedUser ? "flex" : "hidden"} lg:block w-full h-full bg-slate-200 border-l-2 border-gray-300 relative `}>
 
             {selectedUser &&
-                <div className='flex flex-col h-[100vh] w-full'>
+                <div className='flex flex-col h-dvh w-full'>
                     <div className='w-full h-[80px] bg-[#0582ac] rounded-b-[25px] shadow-gray-200 shadow-lg flex items-center gap-[10px]'>
                         <div className='ml-[10px]'>
                             <IoArrowBack className='h-[30px] w-[50px] text-white cursor-pointer' onClick={() => dispatch(setSelectedUser(null))} />
@@ -92,9 +97,9 @@ const MessageArea = () => {
 
                     </div>
 
-                    <div className=' w-full lg:h-[535px] h-[520px] sm:h-[750px]   flex flex-col py-[25px] px-[20px] overflow-auto gap-[20px] bg-emerald-600'>
+                    <div className='flex-1 w-full py-6 px-5 overflow-y-auto flex flex-col gap-5 lg: mb-[80px]'>
                         {showPicker &&
-                            <div className='absolute bottom-[100px] left-[20px]'>
+                            <div className='absolute bottom-[100px] left-[20px] z-[100]'>
                                 <EmojiPicker width={260} height={350} onEmojiClick={onEmojiClick} />
                             </div>
                         }
@@ -117,7 +122,7 @@ const MessageArea = () => {
                 </div>}
 
             {selectedUser &&
-                <div className='absolute bottom-[20px] left-0 w-full flex justify-center items-center px-[10px]'>
+                <div className='absolute bottom-[20px]  w-full flex justify-center items-center px-[10px]'>
 
                     <div>
                         <img src={frontendImage} alt="" className='w-[100px] absolute bottom-[100px] right-[100px] rounded-lg' />
@@ -143,9 +148,14 @@ const MessageArea = () => {
                             <IoImages className='text-[30px] cursor-pointer' />
                         </div>
 
-                        <button>
-                            <IoSendSharp className='text-[30px] cursor-pointer' />
-                        </button>
+
+                        {(input.length > 0 || backendImage != null) &&
+                            (<button>
+                                <IoSendSharp className='text-[30px] cursor-pointer' />
+                            </button>)
+                        }
+
+
 
                     </form>
 

@@ -8,7 +8,7 @@ const Home = () => {
   let {selectedUser} = useSelector(state=>state.user)
  useGetMessages()
   return (
-    <div className='w-full h-[100vh] flex'>
+    <div className='w-full h-dvh flex overflow-hidden'>
       <Sidebar />
       <MessageArea />
     </div> 
