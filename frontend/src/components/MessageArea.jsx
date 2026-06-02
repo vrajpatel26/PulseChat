@@ -14,13 +14,14 @@ import axios from 'axios';
 import { setMessages } from '../redux/messageSlice';
 
 const MessageArea = () => {
-    let { selectedUser, userData, socket } = useSelector(state => state.user)
+    let { selectedUser, userData, socket, onlineUsers } = useSelector(state => state.user)
     let { messages } = useSelector(state => state.message)
     let dispatch = useDispatch()
     let [showPicker, setShowPicker] = useState(false)
     let [input, setInput] = useState("")
     let [frontendImage, setFrontendImage] = useState(null)
     let [backendImage, setBackendImage] = useState(null)
+    const [isTyping, setIsTyping] = useState(false)
 
     let image = useRef()
 
@@ -44,6 +45,8 @@ const MessageArea = () => {
         if (input == 0 && backendImage == null) {
             return
         }
+
+
 
         try {
             let formData = new FormData()
@@ -77,27 +80,70 @@ const MessageArea = () => {
     }, [messages, setMessages])
 
 
+    useEffect(() => {
+
+        if (!socket) return;
+
+        socket.on("userTyping", () => {
+            setIsTyping(true);
+        });
+
+        socket.on("userStopTyping", () => {
+            setIsTyping(false);
+        });
+
+        return () => {
+            socket.off("userTyping");
+            socket.off("userStopTyping");
+        };
+
+    }, [socket]);
+
     return (
         <div className={`lg:w-[70%] ${selectedUser ? "flex" : "hidden"} lg:block w-full h-full bg-slate-200 border-l-2 border-gray-300 relative `}>
 
             {selectedUser &&
                 <div className='flex flex-col h-dvh w-full'>
                     <div className='w-full h-[80px] bg-[#0582ac] rounded-b-[25px] shadow-gray-200 shadow-lg flex items-center gap-[10px]'>
+
                         <div className='ml-[10px]'>
                             <IoArrowBack className='h-[30px] w-[50px] text-white cursor-pointer' onClick={() => dispatch(setSelectedUser(null))} />
                         </div>
-                        <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] mr-3 cursor-pointer ' onClick={() => navigate("/profile")}>
-                            <img
-                                src={selectedUser?.image || dp}
-                                alt="dp"
-                                className='w-full h-full object-cover rounded-full'
-                            />
+
+                        <div className='relative'>
+
+                            <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] mr-3 cursor-pointer ' onClick={() => navigate("/profile")}>
+
+
+                                <img
+                                    src={selectedUser?.image || dp}
+                                    alt="dp"
+                                    className='w-full h-full object-cover rounded-full'
+                                />
+                                {onlineUsers?.includes(selectedUser._id) &&
+                                    <span className='w-[12px] h-[12px] rounded-full absolute bg-green-400 left-9 bottom-0.5'>
+                                    </span>
+                                }
+
+                            </div>
                         </div>
-                        <h1 className='text-white text-[21px] font-semibold'>{selectedUser?.name || "user"}</h1>
+
+                        <div className='mb-1'>
+                            <h1 className='text-white text-[21px] font-semibold'>
+                                {selectedUser?.name || "user"}
+                            </h1>
+
+                            {isTyping && (
+                                <p className='text-white text-sm'>
+                                    typing...
+                                </p>
+                            )}
+                        </div>
 
                     </div>
 
-                    <div className='flex-1 w-full py-6 px-5 overflow-y-auto flex flex-col gap-5 lg: mb-[80px]'>
+                    <div className='flex-1 w-full py-6 px-5 overflow-y-auto flex flex-col gap-5 lg: mb-[80px] bg-slate-200'>
+
                         {showPicker &&
                             <div className='absolute bottom-[100px] left-[20px] z-[100]'>
                                 <EmojiPicker width={260} height={350} onEmojiClick={onEmojiClick} />
@@ -126,6 +172,7 @@ const MessageArea = () => {
 
                     <div>
                         <img src={frontendImage} alt="" className='w-[100px] absolute bottom-[100px] right-[100px] rounded-lg' />
+
                     </div>
 
                     <form className='w-full max-w-[900px] h-[60px] bg-slate-300 rounded-full flex items-center gap-[20px] px-[20px]' onSubmit={handleSendMessage}>
@@ -140,8 +187,27 @@ const MessageArea = () => {
                             type="text"
                             className='h-full w-full border-0 outline-none text-[20px] bg-transparent'
                             placeholder='Message'
-                            onChange={(e) => setInput(e.target.value)}
                             value={input}
+                            onChange={(e) => {
+
+                                setInput(e.target.value);
+
+                                socket.emit("typing", {
+                                    receiverId: selectedUser._id,
+                                    senderName: userData.name
+                                });
+
+                                clearTimeout(window.typingTimer);
+
+                                window.typingTimer = setTimeout(() => {
+
+                                    socket.emit("stopTyping", {
+                                        receiverId: selectedUser._id
+                                    });
+
+                                }, 2000);
+
+                            }}
                         />
 
                         <div onClick={() => image.current.click()}>

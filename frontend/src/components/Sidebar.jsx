@@ -7,20 +7,26 @@ import { TbLogout2 } from "react-icons/tb";
 import axios from 'axios';
 import { serverUrl } from '../main';
 import { useNavigate } from 'react-router-dom';
-import { setOtherUsers, setSelectedUser, setUserData } from '../redux/userSlice';
+import { setOtherUsers, setSearchData, setSelectedUser, setUserData } from '../redux/userSlice';
+import { useEffect } from 'react';
 
 
 const Sidebar = () => {
-    let { userData, otherUsers, selectedUser, onlineUsers } = useSelector(state => state.user)
+    let { userData, otherUsers, selectedUser, onlineUsers, searchData } = useSelector(state => state.user)
     let [search, setSearch] = useState(false)
+    let [input, setInput] = useState("")
+
     let dispatch = useDispatch()
     let navigate = useNavigate()
+
     let handleLogOut = async () => {
         try {
             let result = await axios.get(`${serverUrl}/api/auth/logout`, { withCredentials: true })
 
             dispatch(setUserData(null))
             dispatch(setOtherUsers(null))
+            dispatch(setSelectedUser(null))
+            dispatch(setSearchData(null))
             navigate("/login")
 
         } catch (error) {
@@ -28,15 +34,62 @@ const Sidebar = () => {
 
         }
     }
-    return (
-        <div className={`lg:w-[30%] lg:block ${!selectedUser ? "block" : "hidden "} w-full h-full bg-slate-200`}>
 
+    let handleSearch = async () => {
+        try {
+            let result = await axios.get(`${serverUrl}/api/user/search?query=${input}`, { withCredentials: true })
+
+            dispatch(setSearchData(result.data))
+
+
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    useEffect(() => {
+        if (input) {
+            handleSearch()
+        }
+    }, [input])
+
+    return (
+        <div className={`lg:w-[30%] lg:block ${!selectedUser ? "block" : "hidden "} w-full h-full bg-slate-200 relative`}>
+            {input.length > 0 &&
+                <div className='w-full h-[500px] absolute top-[300px] bg-slate-200 flex flex-col overflow-y-auto gap-[20px] z-[150] items-center pt-[20px]'>
+                    {searchData?.map((user) => (
+                        <div className='w-[90%] h-[60px] rounded-full flex justify-start items-center bg-white gap-[10px] hover:bg-gray-300 cursor-pointer' onClick={() => {
+                            dispatch(setSelectedUser(user))
+                            setInput("")
+                            setSearch(false)
+                            dispatch(setSearchData([]))
+                        }}>
+
+                            <div className='relative flex justify-center items-center rounded-full'>
+                                <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] mr-3 m-[10px]'>
+                                    <img
+                                        src={user.image || dp}
+                                        alt="dp"
+                                        className='w-full h-full object-cover rounded-full'
+                                    />
+                                </div>
+                                {onlineUsers?.includes(user._id) &&
+                                    <span className='w-[12px] h-[12px] rounded-full absolute bg-green-400 right-3 bottom-3'>
+                                    </span>
+                                }
+                            </div>
+                            <h1 className='text-gray-600 text-[15px] font-semibold'>{user.name || user.userName}</h1>
+                        </div>
+                    ))}
+                </div>
+            }
             <div className='w-full h-[300px] bg-[#20c7ff] rounded-b-[30%] shadow-gray-200 shadow-lg flex justify-center flex-col '>
 
-                <h1 className='text-white text-[27px] font-bold  px-[30px]'>PulseChat</h1>
+                <h1 className='text-white text-[30px] font-bold  px-[30px]'>PulseChat</h1>
 
                 <div className='flex justify-between items-center'>
-                    <h1 className='text-gray-600 text-xl font-bold  px-[30px]'>Hii , {userData.name || "User"}</h1>
+                    <h1 className='text-gray-600 text-[25px] font-bold  px-[30px]'>Hello, {userData.name || "User"}</h1>
 
                     <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[60px] w-[60px] mr-3 cursor-pointer ' onClick={() => navigate("/profile")}>
                         <img
@@ -58,14 +111,15 @@ const Sidebar = () => {
                     {search &&
                         <form className='w-[90%] h-[50px] ml-[30px] mt-[10px] bg-white flex items-center gap-[10px] rounded-full overflow-hidden px-[20px]'>
                             <IoIosSearch className='h-[25px] w-[25px] cursor-pointer' />
-                            <input type="text" placeholder='search users...' className='h-full w-full p-[10px] outline-0 border-0 ' />
+                            <input type="text" placeholder='search users...' className='h-full w-full p-[10px] outline-none border-0 ' onChange={(e) => setInput(e.target.value)} value={input} />
                             <RxCross2 className='h-[25px] w-[25px] cursor-pointer' onClick={() => setSearch(false)} />
+
 
                         </form>
                     }
                     {!search && otherUsers?.map((user) => (
                         onlineUsers?.includes(user._id) &&
-                        <div className='relative flex justify-center items-center rounded-full'>
+                        <div className='relative flex justify-center items-center rounded-full cursor-pointer' onClick={() => dispatch(setSelectedUser(user))}>
                             <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] mr-3 mt-[10px]'>
                                 <img
                                     src={user.image || dp}
@@ -82,8 +136,10 @@ const Sidebar = () => {
                 </div>
             </div>
 
-            <div className='w-full h-[44%] flex flex-col items-center gap-[20px] overflow-auto mt-[15px]'>
+
+            <div className='w-full h-[45%] flex flex-col items-center gap-[20px] overflow-auto mt-[15px]'>
                 {otherUsers?.map((user) => (
+
                     <div className='w-[90%] h-[60px] rounded-full flex justify-start items-center bg-white gap-[10px] hover:bg-gray-300 cursor-pointer' onClick={() => dispatch(setSelectedUser(user))}>
 
                         <div className='relative flex justify-center items-center rounded-full'>

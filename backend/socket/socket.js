@@ -14,7 +14,7 @@ const io = new Server(server, {
 
 const userSocketMap = {}
 
-export const getReceiverSocketId = (receiver) =>{
+export const getReceiverSocketId = (receiver) => {
     return userSocketMap[receiver]
 }
 
@@ -28,6 +28,30 @@ io.on("connection", (socket) => {
     }
 
     io.emit("getOnlineUsers", Object.keys(userSocketMap))
+
+
+    //for typing..
+    socket.on("typing", ({ receiverId, senderName }) => {
+
+        const receiverSocketId = getReceiverSocketId(receiverId);
+
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("userTyping", {
+                senderName
+            });
+        }
+
+    });
+
+    socket.on("stopTyping", ({ receiverId }) => {
+
+        const receiverSocketId = getReceiverSocketId(receiverId);
+
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("userStopTyping");
+        }
+
+    });
 
     socket.on("disconnect", () => {
         delete userSocketMap[userId]
