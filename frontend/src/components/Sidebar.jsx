@@ -11,7 +11,7 @@ import { setOtherUsers, setSelectedUser, setUserData } from '../redux/userSlice'
 
 
 const Sidebar = () => {
-    let { userData, otherUsers , selectedUser } = useSelector(state => state.user)
+    let { userData, otherUsers, selectedUser, onlineUsers } = useSelector(state => state.user)
     let [search, setSearch] = useState(false)
     let dispatch = useDispatch()
     let navigate = useNavigate()
@@ -48,7 +48,7 @@ const Sidebar = () => {
 
 
                 </div>
-                <div className='flex items-center gap-[20px]'>
+                <div className='flex items-center gap-[20px] overflow-y-auto'>
 
                     {!search &&
                         <div className='bg-white rounded-full mt-[10px] border-2 border-[#20c7ff] h-[50px] w-[50px] flex items-center justify-center ml-[25px] ' onClick={() => setSearch(true)}>
@@ -64,30 +64,42 @@ const Sidebar = () => {
                         </form>
                     }
                     {!search && otherUsers?.map((user) => (
-                        <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] mr-3 mt-[10px]'>
-                            <img
-                                src={user.image || dp}
-                                alt="dp"
-                                className='w-full h-full object-cover rounded-full'
-                            />
+                        onlineUsers?.includes(user._id) &&
+                        <div className='relative flex justify-center items-center rounded-full'>
+                            <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] mr-3 mt-[10px]'>
+                                <img
+                                    src={user.image || dp}
+                                    alt="dp"
+                                    className='w-full h-full object-cover rounded-full'
+                                />
+                            </div>
+                            <span className='w-[12px] h-[12px] rounded-full absolute bg-green-400 right-3 bottom-0.5'></span>
                         </div>
+
                     ))}
 
 
                 </div>
             </div>
 
-            <div className='w-full flex flex-col items-center gap-[20px] overflow-auto mt-[15px]'>
+            <div className='w-full h-[44%] flex flex-col items-center gap-[20px] overflow-auto mt-[15px]'>
                 {otherUsers?.map((user) => (
-                    <div className='w-[90%] h-[60px] rounded-full flex justify-start items-center bg-white gap-[20px] hover:bg-gray-300 cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
-                        <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[40px] w-[40px] ml-[10px] '>
-                            <img
-                                src={user.image || dp}
-                                alt="dp"
-                                className='w-full h-full object-cover rounded-full'
-                            />
+                    <div className='w-[90%] h-[60px] rounded-full flex justify-start items-center bg-white gap-[10px] hover:bg-gray-300 cursor-pointer' onClick={() => dispatch(setSelectedUser(user))}>
+
+                        <div className='relative flex justify-center items-center rounded-full'>
+                            <div className='bg-white rounded-full border-2 border-[#20c7ff] h-[50px] w-[50px] mr-3 m-[10px]'>
+                                <img
+                                    src={user.image || dp}
+                                    alt="dp"
+                                    className='w-full h-full object-cover rounded-full'
+                                />
+                            </div>
+                            {onlineUsers?.includes(user._id) &&
+                                <span className='w-[12px] h-[12px] rounded-full absolute bg-green-400 right-3 bottom-3'>
+                                </span>
+                            }
                         </div>
-                            <h1 className='text-gray-600 text-[15px] font-semibold'>{user.name || user.userName}</h1>
+                        <h1 className='text-gray-600 text-[15px] font-semibold'>{user.name || user.userName}</h1>
                     </div>
 
                 ))}
