@@ -85,9 +85,17 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
     try {
 
-        await User.findByIdAndUpdate(req.userId, {
-            lastSeen: new Date()
-        });
+        console.log("REQ USER ID:", req.userId);
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.userId,
+            {
+                lastSeen: new Date()
+            },
+            { new: true }
+        );
+
+        console.log("UPDATED USER:", updatedUser);
 
         res.clearCookie("token");
 
@@ -96,6 +104,7 @@ export const logout = async (req, res) => {
         });
 
     } catch (error) {
+        console.log("LOGOUT ERROR:", error);
         return res.status(500).json({
             message: `logout error ${error}`
         });
