@@ -1,7 +1,7 @@
 import http from "http"
 import express from "express"
 import { Server } from "socket.io"
-import User from "../models/user.model"
+import User from "../models/user.model.js"
 
 const app = express()
 
