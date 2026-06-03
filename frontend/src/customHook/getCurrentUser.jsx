@@ -7,7 +7,7 @@ import { setUserData } from "../redux/userSlice"
 const getCurrentUser = () => {
 
     let dispatch = useDispatch()
-    let { userData } = useSelector(state => state.user)
+    // let { userData } = useSelector(state => state.user)
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -21,7 +21,7 @@ const getCurrentUser = () => {
         }
         fetchUser()
 
-    }, [userData])
+    }, [])
 }
 
 export default getCurrentUser
