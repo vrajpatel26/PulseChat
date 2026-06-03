@@ -21,7 +21,7 @@ const getOtherUsers = () => {
         }
         fetchUser()
 
-    }, [userData])
+    }, [userData?._id])
 }
 
 export default getOtherUsers
