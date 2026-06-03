@@ -25,6 +25,17 @@ const MessageArea = () => {
 
     let image = useRef()
 
+    const messagesEndRef = useRef(null);
+
+    //for scroll to latest message
+    useEffect(() => {
+
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }, [messages]);
+
     const onEmojiClick = (emojiData) => {
         setInput(prevInput => prevInput + emojiData.emoji)
 
@@ -84,12 +95,20 @@ const MessageArea = () => {
 
         if (!socket) return;
 
-        socket.on("userTyping", () => {
-            setIsTyping(true);
+        socket.on("userTyping", ({ senderId }) => {
+
+            if (senderId === selectedUser?._id) {
+                setIsTyping(true);
+            }
+
         });
 
-        socket.on("userStopTyping", () => {
-            setIsTyping(false);
+        socket.on("userStopTyping", ({ senderId }) => {
+
+            if (senderId === selectedUser?._id) {
+                setIsTyping(false);
+            }
+
         });
 
         return () => {
@@ -97,7 +116,7 @@ const MessageArea = () => {
             socket.off("userStopTyping");
         };
 
-    }, [socket]);
+    }, [socket, selectedUser]);
 
 
     const formatLastSeen = (lastSeen) => {
@@ -186,7 +205,9 @@ const MessageArea = () => {
                                         : <ReceiverMessage messageData={mess} />
                                 }
                             </div>
+
                         ))}
+                        <div ref={messagesEndRef}></div>
                     </div>
                 </div>
             }
