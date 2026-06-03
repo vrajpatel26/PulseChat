@@ -99,6 +99,21 @@ const MessageArea = () => {
 
     }, [socket]);
 
+
+    const formatLastSeen = (lastSeen) => {
+
+        if (!lastSeen) return "recently";
+
+        const date = new Date(lastSeen);
+
+        return date.toLocaleString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            day: "numeric",
+            month: "short"
+        });
+    };
+
     return (
         <div className={`lg:w-[70%] ${selectedUser ? "flex" : "hidden"} lg:block w-full h-full bg-slate-200 border-l-2 border-gray-300 relative `}>
 
@@ -133,10 +148,24 @@ const MessageArea = () => {
                                 {selectedUser?.name || "user"}
                             </h1>
 
-                            {isTyping && (
+                            {isTyping ? (
+
                                 <p className='text-white text-sm'>
                                     typing...
                                 </p>
+
+                            ) : onlineUsers?.includes(selectedUser?._id) ? (
+
+                                <p className='text-white text-sm'>
+                                    online
+                                </p>
+
+                            ) : (
+
+                                <p className='text-white text-sm'>
+                                    Last seen {formatLastSeen(selectedUser?.lastSeen)}
+                                </p>
+
                             )}
                         </div>
 
@@ -153,8 +182,8 @@ const MessageArea = () => {
                             <div key={mess._id}>
                                 {
                                     mess.sender?.toString() === userData?._id?.toString()
-                                        ? <SenderMessage image={mess.image} message={mess.message} />
-                                        : <ReceiverMessage image={mess.image} message={mess.message} />
+                                        ? <SenderMessage messageData={mess} />
+                                        : <ReceiverMessage messageData={mess} />
                                 }
                             </div>
                         ))}

@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema(
         userName: {
             type: String,
             required: true,
-            unique:true
+            unique: true
         },
         email: {
             type: String,
@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema(
         image: {
             type: String,
             default: ""
+        },
+        lastSeen: {
+            type: Date,
+            default: null
         }
     },
     { timestamps: true })

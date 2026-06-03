@@ -1,6 +1,7 @@
 import http from "http"
 import express from "express"
 import { Server } from "socket.io"
+import User from "../models/user.model"
 
 const app = express()
 
@@ -53,8 +54,13 @@ io.on("connection", (socket) => {
 
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
         delete userSocketMap[userId]
+
+        await User.findByIdAndUpdate(userId, {
+            lastSeen: new Date()
+        })
+
         io.emit("getOnlineUsers", Object.keys(userSocketMap))
     })
 })
