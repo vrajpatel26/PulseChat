@@ -223,10 +223,9 @@ Add screenshots inside a `screenshots` folder and update the paths below.
 
 **Vraj Patel**
 
-BE Computer Engineering
-
-MERN Stack Developer
-
+* BE Computer Engineering
+* MERN Stack Developer
+* Passionate about Full Stack Development
 
 LinkedIn: https://www.linkedin.com/in/vraj-patel-3b94542a4/
 
