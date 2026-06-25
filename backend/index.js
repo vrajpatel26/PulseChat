@@ -16,7 +16,7 @@ import { app, server} from "./socket/socket.js";
 const PORT = process.env.PORT ||5000;
 
 app.use(cors({
-    origin:"https://pulsechat-ytwt.onrender.com",
+    origin:"https://pulsechat-app.vercel.app",
     credentials:true
 }))
 

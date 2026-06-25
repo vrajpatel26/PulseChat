@@ -9,7 +9,7 @@ const server = http.createServer(app)
 
 const io = new Server(server, {
     cors: {
-        origin: "https://pulsechat-ytwt.onrender.com"
+        origin: "https://pulsechat-app.vercel.app"
     }
 })
 
