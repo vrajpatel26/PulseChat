@@ -69,7 +69,7 @@ const SignUp = () => {
                     className='w-full flex flex-col gap-[20px] items-center'
                     onSubmit={handleSignUp}
                 >
-
+                    
                     <input
                         type="text"
                         placeholder='username'
