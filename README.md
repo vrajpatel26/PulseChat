@@ -186,7 +186,6 @@ CLOUDINARY_API_SECRET=your_cloudinary_secret
 
 ## 📸 Screenshots
 
-Add screenshots inside a `screenshots` folder and update the paths below.
 
 ### Login Page
 
